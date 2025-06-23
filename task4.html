@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Basic Calculator</title>
+    <style>
+        body {
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .calculator {
+            background: #222;
+            padding: 24px 18px;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+            width: 320px;
+        }
+        .display {
+            background: #111111;
+            color: #fff;
+            font-size: 2rem;
+            padding: 18px 10px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            text-align: right;
+            min-height: 40px;
+            overflow-x: auto;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        button {
+            padding: 18px 0;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 8px;
+            background: #333;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button.operator {
+            background: #a200ff;
+            color: #fff;
+        }
+        button.equal {
+            background: #34b6c7;
+            color: #fff;
+            grid-column: span 2;
+        }
+        button.clear {
+            background: #e3ff30;
+            color: #fff;
+        }
+        button:active {
+            background: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="clear" id="clear">C</button>
+            <button class="operator" data-op="/">÷</button>
+            <button class="operator" data-op="*">×</button>
+            <button class="operator" data-op="-">−</button>
+            <button data-num="7">7</button>
+            <button data-num="8">8</button>
+            <button data-num="9">9</button>
+            <button class="operator" data-op="+">+</button>
+            <button data-num="4">4</button>
+            <button data-num="5">5</button>
+            <button data-num="6">6</button>
+            <button data-num="1">1</button>
+            <button data-num="2">2</button>
+            <button data-num="3">3</button>
+            <button class="equal" id="equal">=</button>
+            <button data-num="0" style="grid-column: span 2;">0</button>
+            <button data-num=".">.</button>
+        </div>
+    </div>
+    <script>
+        const display = document.getElementById('display');
+        const buttons = document.querySelectorAll('.buttons button');
+        let current = '';
+        let operator = '';
+        let operand = '';
+        let resultShown = false;
+
+        function updateDisplay(val) {
+            display.textContent = val;
+        }
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.hasAttribute('data-num')) {
+                    if (resultShown) {
+                        current = '';
+                        resultShown = false;
+                    }
+                    let num = btn.getAttribute('data-num');
+                    if (num === '.' && current.includes('.')) return;
+                    if (current === '0' && num !== '.') current = '';
+                    current += num;
+                    updateDisplay(current);
+                } else if (btn.hasAttribute('data-op')) {
+                    if (current === '' && operand === '') return;
+                    if (operand !== '' && current !== '') {
+                        operand = calculate(operand, current, operator);
+                        updateDisplay(operand);
+                        current = '';
+                    } else if (current !== '') {
+                        operand = current;
+                        current = '';
+                    }
+                    operator = btn.getAttribute('data-op');
+                    resultShown = false;
+                } else if (btn.id === 'equal') {
+                    if (operand !== '' && current !== '' && operator !== '') {
+                        operand = calculate(operand, current, operator);
+                        updateDisplay(operand);
+                        current = '';
+                        operator = '';
+                        resultShown = true;
+                    }
+                } else if (btn.id === 'clear') {
+                    current = '';
+                    operand = '';
+                    operator = '';
+                    updateDisplay('0');
+                }
+            });
+        });
+ </script>
+</body>
+</html>
